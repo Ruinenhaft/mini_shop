@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.sql.*;
 
-public class MyFrame extends JFrame {
+public class PDFrame extends JFrame {
 
 	// 최상단 부터 한단계씩 아래로
 	// 검색
@@ -37,13 +37,13 @@ public class MyFrame extends JFrame {
 
 	// 매진여부(체크박스), 남은수량
 	private JLabel soldout_lb;
-	private JTextField soldout;// 매진이면 빨간색 바탕에 검정색 글씨로 매진 출력. 아니면 초록색 바탕.
+	private JTextField soldout;
 
 	private JLabel count_lb;
 	private JTextField count_output;
 
 	// 정보
-	private TextArea info;
+	private JTextArea info;
 	
 	//하단 버튼
 	private JButton btnDrop;
@@ -53,11 +53,11 @@ public class MyFrame extends JFrame {
 	//이미지 경로
 	private String img_loc = "image/No_Image.png";
 	
-	public MyFrame() {
+	public PDFrame() {
 
-		init();
-		setDisplay();
-		showDisply();
+		init();//초기화 메서드
+		setDisplay();//폼 세팅 메서드
+		showDisply();//기능 메서드
 	}
 
 	public void init(){
@@ -66,31 +66,34 @@ public class MyFrame extends JFrame {
 		btnSearch = new JButton("검색");
 		btnSearch.addActionListener(new btnSearch_func());
 		category_lb = new JLabel("종류 :");
-		category_output = new JTextField("DB값 입력");
+		category_output = new JTextField("-");
 
 		ImageIcon icon = new ImageIcon(img_loc);// 추후 디렉토리에서 직접 불러오는 파일로드? 찾아보기, DB에서 이미지 파일 이름 받아올것.
 		product_img = new JLabel(icon);
 
 		price_lb = new JLabel("가격 :");
-		price_output = new JTextField("DB값 입력");
+		price_output = new JTextField("0");
 		saleRate_lb = new JLabel("할인률 :");
 		saleRate_output = new JTextField("0");
 		sale_lb = new JLabel("할인가 :");
-		sale_lb_output = new JTextField("DB값 입력");
+		sale_lb_output = new JTextField("0");
 		date_lb = new JLabel("출시일 :");
-		date_output = new JTextField("DB값 입력");
+		date_output = new JTextField("2022-12-22");
 		soldout_lb = new JLabel("매진여부 :");
-		soldout = new JTextField("매진");
+		soldout = new JTextField("-");
 		count_lb = new JLabel("남은수량 :");
-		count_output = new JTextField("DB값 입력");
+		count_output = new JTextField("0");
 		btnDrop = new JButton("삭제");
 		btnDrop.addActionListener(new btnDrop_func());
 		btnAdd = new JButton("추가");
 		btnAdd.addActionListener(new btnAdd_func());
 		btnModify = new JButton("수정");
 		btnModify.addActionListener(new btnModify_func());
-		info = new TextArea("정보", 10, 10);
+		info = new JTextArea("정보", 10, 10);
+		info.setLineWrap(true);//자동줄바꿈.
+		
 	}
+	
 	private class btnModify_func implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
@@ -107,7 +110,7 @@ public class MyFrame extends JFrame {
 				String querry = String.format("UPDATE product_info_tbl SET prod_kind = ?, prod_price =?, prod_sale_price=?, prod_coment=?, prod_image_src=?, prod_count=?, prod_soldout_yn=?, prod_stocking_date=?"
 						+ " WHERE prod_name = '%s';", name);
 				
-				PreparedStatement pstmt = null;
+				PreparedStatement pstmt = null;//상단 querry의 ? 부분에 하나씩 인자를 넣을 수 있는 형식.
 				try {
 					pstmt = conn.prepareStatement(querry);
 					pstmt.setString(1, category_output.getText());
@@ -196,7 +199,7 @@ public class MyFrame extends JFrame {
 					pstmt.setString(4, price_output.getText());
 					pstmt.setString(5, sale_lb_output.getText());
 					pstmt.setString(6, info.getText());
-					pstmt.setString(7, null);//이미지 경로.
+					pstmt.setString(7, String.format(tbxSearch.getName() + ".PNG"));//이미지 경로.
 					pstmt.setString(8, count_output.getText());
 					pstmt.setString(9, soldout.getText());
 					pstmt.setString(10, date_output.getText());
@@ -222,6 +225,7 @@ public class MyFrame extends JFrame {
 		}
 
 	}
+	
 	public void setDisplay() {
 		JPanel pnlLayer1 = new JPanel(new GridLayout(1, 3));
 		pnlLayer1.add(search);
@@ -271,7 +275,7 @@ public class MyFrame extends JFrame {
 	}
 
 	public void showDisply() {
-		setTitle("GridLayout Sample");
+		setTitle("Product info");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(500, 600);
 		setResizable(false);// 사이즈 조절 불가
@@ -308,6 +312,7 @@ public class MyFrame extends JFrame {
 			//saleRate_output
 		}
 	}
+
 
 	private class btnSearch_func implements ActionListener {
 
